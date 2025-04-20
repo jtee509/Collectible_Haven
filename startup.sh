@@ -38,11 +38,6 @@ curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 sudo apt install -y nodejs
 sudo apt install -y npm
 
-# Install Nginx
-sudo apt install -y nginx
-sudo systemctl start nginx
-sudo systemctl enable nginx
-
 # Allow HTTP and HTTPS traffic through the firewall
 sudo ufw allow 'Nginx Full'
 sudo ufw enable
@@ -60,6 +55,11 @@ cp .env.example .env
 php artisan key:generate
 php artisan migrate
 php artisan storage:link
+
+# Install Nginx
+sudo apt install -y nginx
+sudo systemctl start nginx
+sudo systemctl enable nginx
 
 # Copy Nginx configuration file
 sudo cp collectible_haven.conf /etc/nginx/sites-available/collectible_haven.conf
