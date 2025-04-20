@@ -21,15 +21,6 @@ sudo apt install -y mariadb-server
 sudo systemctl start mariadb
 sudo systemctl enable mariadb
 
-# Run MySQL commands
-sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'Something@123';"
-sudo mysql -e "FLUSH PRIVILEGES;"
-
-# Restart MySQL service
-sudo service mysql restart
-
-echo "MySQL root user authentication method updated and service restarted."
-
 # Secure MariaDB installation (you may want to customize this)
 sudo mysql_secure_installation
 
@@ -55,11 +46,6 @@ npm install
 
 # Copy .env.example to .env
 cp .env.example .env
-
-# Generate application key, run migrations, and create storage link
-php artisan key:generate
-php artisan migrate
-php artisan storage:link
 
 # Copy Nginx configuration file
 sudo cp collectible_haven.conf /etc/nginx/sites-available/collectible_haven.conf
