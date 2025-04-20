@@ -14,8 +14,8 @@ done
 
 # Configure database
 mysql -e "CREATE DATABASE IF NOT EXISTS collectible_haven;" \
-      -e "CREATE USER IF NOT EXISTS 'collectible_user'@'localhost' IDENTIFIED BY 'password';" \
-      -e "GRANT ALL PRIVILEGES ON collectible_haven.* TO 'collectible_user'@'localhost';" \
+      -e "CREATE USER IF NOT EXISTS 'root'@'localhost' IDENTIFIED BY '';" \
+      -e "GRANT ALL PRIVILEGES ON collectible_haven.* TO 'root'@'localhost';" \
       -e "FLUSH PRIVILEGES;"
 
 # Run migrations
@@ -25,8 +25,6 @@ php artisan migrate --force
 # Start cron
 service cron start
 
-# Start Vite dev server in background
-npm run dev &
-
 # Start Laravel development server
-php artisan serve --host=0.0.0.0 --port=8000
+composer run dev --host=0.0.0.0 --port=8000
+
