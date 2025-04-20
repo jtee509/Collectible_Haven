@@ -22,7 +22,7 @@ sudo systemctl start mariadb
 sudo systemctl enable mariadb
 
 # Run MySQL commands
-sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '';"
+sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Something@123';"
 sudo mysql -e "FLUSH PRIVILEGES;"
 
 # Restart MySQL service
