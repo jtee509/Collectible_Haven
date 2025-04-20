@@ -6,7 +6,6 @@ sudo apt upgrade -y
 
 # Install PHP 8.3 and required extensions
 sudo apt install -y software-properties-common
-
 sudo apt update
 sudo apt install -y php php-cli php-fpm php-mysql php-xml php-mbstring php-curl php-zip php-bcmath
 
