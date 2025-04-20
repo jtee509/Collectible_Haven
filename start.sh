@@ -1,17 +1,19 @@
 #!/bin/bash
 
-# Start MySQL
+# Start services
 service mysql start
+service php8.3-fpm start
+service cron start
 
-# Configure database
+# Configure MySQL
 mysql -e "CREATE DATABASE IF NOT EXISTS collectible_haven;"
 mysql -e "CREATE USER IF NOT EXISTS 'collectible_user'@'localhost' IDENTIFIED BY 'test';"
 mysql -e "GRANT ALL PRIVILEGES ON collectible_haven.* TO 'collectible_user'@'localhost';"
 mysql -e "FLUSH PRIVILEGES;"
 
-# Run migrations (optional)
+# Start npm run dev
 cd /var/www/collectible_haven
-php artisan migrate --force
+npm run dev &  # Run in background
 
-# Start Laravel development server
-php artisan serve --host=0.0.0.0 --port=8000
+# Start nginx (this will keep the container running)
+exec nginx -g "daemon off;"

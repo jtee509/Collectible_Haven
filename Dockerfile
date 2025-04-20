@@ -13,13 +13,11 @@ RUN apt-get update && apt-get install -y \
     nodejs \
     npm \
     cron \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    zip \
-    unzip
+    mariadb-server \
+    mariadb-client \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Add PHP 8.3 repository and install PHP
+# Install PHP 8.3 and required extensions
 RUN add-apt-repository ppa:ondrej/php -y && \
     apt-get update && \
     apt-get install -y \
@@ -31,45 +29,39 @@ RUN add-apt-repository ppa:ondrej/php -y && \
     php8.3-zip \
     php8.3-gd \
     php8.3-bcmath \
-    php8.3-pdo
+    php8.3-pdo \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Clone the repository
-RUN git clone https://github.com/jtee509/Collectible_haven /var/www/collectible_haven
-
-# Set working directory
+# Create directory for the application
 WORKDIR /var/www/collectible_haven
 
-# Install PHP dependencies
-RUN composer install --no-interaction --optimize-autoloader --no-dev
+# Clone the repository
+RUN git clone https://github.com/jtee509/Collectible_Haven . \
+    && composer install --no-interaction --prefer-dist \
+    && npm install --production
 
-# Install NPM dependencies
-RUN npm install && npm run build
-
-# Configure Nginx and PHP-FPM
-COPY ./collectible_haven.conf /etc/nginx/sites-available/
+# Configure Nginx
+COPY collectible_haven.conf /etc/nginx/sites-available/
 RUN ln -s /etc/nginx/sites-available/collectible_haven.conf /etc/nginx/sites-enabled/ \
     && rm /etc/nginx/sites-enabled/default \
     && mkdir -p /run/php \
     && chown -R www-data:www-data /var/www/collectible_haven/storage \
     && chown -R www-data:www-data /var/www/collectible_haven/bootstrap/cache
 
-# Copy environment file and generate key
-RUN cp .env.example .env \
-    && php artisan key:generate
-
-# Set up auto-updates with cron
-RUN echo "* * * * * cd /var/www/collectible_haven && git fetch --all && git reset --hard origin/main && composer install --no-interaction --optimize-autoloader --no-dev && npm install && npm run build && php artisan migrate --force" >> /etc/cron.d/collectible_haven-auto-update \
+# Configure cron for auto-updates
+RUN echo "* * * * * cd /var/www/collectible_haven && git fetch --all && git reset --hard origin/main && composer install --no-interaction --prefer-dist && npm install --production" >> /etc/cron.d/collectible_haven-auto-update \
     && chmod 0644 /etc/cron.d/collectible_haven-auto-update \
     && crontab /etc/cron.d/collectible_haven-auto-update
+
+# Copy startup script
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
 
 # Expose ports
 EXPOSE 80 8000
 
 # Start services
-CMD service cron start && \
-    service php8.3-fpm start && \
-    php artisan migrate --force && \
-    nginx -g "daemon off;"
+CMD ["/start.sh"]
