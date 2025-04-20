@@ -14,7 +14,6 @@ php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 php -r "if (hash_file('sha384', 'composer-setup.php') === 'dac665fdc30fdd8ec78b38b9800061b4150413ff2e3b6f88543c636f7cd84f6db9189d43a81e5503cda447da73c7e5b6') { echo 'Installer verified'.PHP_EOL; } else { echo 'Installer corrupt'.PHP_EOL; unlink('composer-setup.php'); exit(1); }"
 php composer-setup.php
 php -r "unlink('composer-setup.php');"
-s
 sudo mv composer.phar /usr/local/bin/composer
 
 # Install MariaDB
@@ -22,12 +21,22 @@ sudo apt install -y mariadb-server
 sudo systemctl start mariadb
 sudo systemctl enable mariadb
 
+# Run MySQL commands
+sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '';"
+sudo mysql -e "FLUSH PRIVILEGES;"
+
+# Restart MySQL service
+sudo service mysql restart
+
+echo "MySQL root user authentication method updated and service restarted."
+
 # Secure MariaDB installation (you may want to customize this)
 sudo mysql_secure_installation
 
 # Install Node.js (using NodeSource)
 curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 sudo apt install -y nodejs
+sudo apt install -y npm
 
 # Install Nginx
 sudo apt install -y nginx
