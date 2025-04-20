@@ -5,7 +5,7 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
     mysql_install_db --user=mysql --ldata=/var/lib/mysql
 fi
 
-service mysql start
+service mariadb start
 
 # Wait for MySQL to be ready
 while ! mysqladmin ping -hlocalhost --silent; do
