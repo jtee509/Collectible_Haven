@@ -42,10 +42,12 @@ Collectible Haven is a Laravel-based web application designed for collectors to 
 1. Clone the repository 
 2. Run the command and press enter:
 ```bash
-sudo apt update && sudo apt install mariadb-server -y && sudo mysqld_safe --skip-grant-tables &
+cd Collectible_Haven
+sudo apt update && sudo apt install mariadb-server -y 
 ```
 3. Enter mysql command, press enter and there is no password:
 ```bash
+sudo mysqld_safe --skip-grant-tables & 
 sudo mysql -u root -p ''
 ```
 
@@ -63,7 +65,6 @@ sudo systemctl restart mariadb
 ```
 6. Run migrations:
 ```bash
-cd Collectible_haven
 sudo chmod +x ./startup.sh && ./startup.sh
 ```
 #### Testing run
