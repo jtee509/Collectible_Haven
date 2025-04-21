@@ -31,7 +31,6 @@ Collectible Haven is a Laravel-based web application designed for collectors to 
 
 
 ## Prerequisites
-- Docker (Do not require for manual installation)
 - PHP >= 8.3
 - Composer 
 - Xampp or MariaDB
@@ -39,31 +38,60 @@ Collectible Haven is a Laravel-based web application designed for collectors to 
 
 ## Installation
 
-### Option 2: Manual Setup
+### Manual Setup
 1. Clone the repository 
-2. Install dependencies:
+2. Run the command and press enter:
 ```bash
-sudo apt install mariadb-server -y && mysql -u root -p
+sudo apt update && sudo apt install mariadb-server -y && sudo mysqld_safe --skip-grant-tables &
 ```
-3. Run following mysql command :
+3. Enter mysql command, press enter and there is no password:
 ```bash
+sudo mysql -u root -p ''
+```
+
+4. Run following mysql command :
+```bash
+CREATE DATABASE collectible_haven;
 GRANT ALL PRIVILEGES ON *.* TO 'root'@'%';
 FLUSH PRIVILEGES;
+SET PASSWORD FOR 'root'@'localhost' = PASSWORD('');
 EXIT;
 ```
-4. Restart Mariadb Server:
+5. Restart Mariadb Server:
 ```bash
 sudo systemctl restart mariadb
 ```
-5. Run migrations:
+6. Run migrations:
 ```bash
-sudo chmod +x ./startup.sh
-./startup.sh
+cd Collectible_haven
+sudo chmod +x ./startup.sh && ./startup.sh
 ```
 #### Testing run
 Run a pre loaded data for testing the file:
 ```bash
 php artisan db:seed
+```
+
+#### Optional Choice (Domain Testing)
+1. Install Nginx:
+```bash
+sudo apt install -y nginx && sudo ufw allow 'Nginx Full' 
+```
+2. Modify the collectible_haven.conf to your path :
+```bash
+sudo nano collectible_haven.conf
+```
+3. Create a symbolic link to enable the site
+```bash
+sudo ln -s /etc/nginx/sites-available/collectible_haven.conf /etc/nginx/sites-enabled/
+```
+4. Verify Nginx Configuration:
+```bash
+sudo nginx -t && sudo systemctl reload nginx && sudo ufw disable && sudo ufw enable
+```
+5. Optional: Add entry to /etc/hosts for collecthaven.test
+```bash
+sudo tee -a /etc/hosts
 ```
 
 ## Environment Variables

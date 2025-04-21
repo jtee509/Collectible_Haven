@@ -1,81 +1,54 @@
 #!/bin/bash
 
 # Update package list and install necessary packages
+echo "Updating package list and upgrading installed packages..."
 sudo apt update
 sudo apt upgrade -y
 
 # Install PHP 8.3 and required extensions
+echo "Installing PHP 8.3 and required extensions..."
 sudo apt install -y software-properties-common
+sudo add-apt-repository ppa:ondrej/php -y
 sudo apt update
-sudo apt install -y php php-cli php-fpm php-mysql php-xml php-mbstring php-curl php-zip php-bcmath
+sudo apt install -y php8.3 php8.3-cli php8.3-fpm php8.3-mysql php8.3-xml php8.3-mbstring php8.3-curl php8.3-zip php8.3-bcmath
 
 # Install Composer
+echo "Installing Composer..."
 curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php
 sudo php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer
 
 # Install Node.js (using NodeSource)
+echo "Installing Node.js..."
 curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 sudo apt install -y nodejs
 sudo apt install -y npm
 
-# Install Nginx
-sudo apt install -y nginx
-sudo ufw allow 'Nginx Full'
+# Start the MariaDB service normally
+echo "Starting MariaDB service..."
+sudo systemctl start mariadb
+
+cp .env.example .env
 
 # Run Composer install
+echo "Running Composer install..."
 composer install
 
 # Run NPM install
+echo "Running NPM install..."
 npm install
 
-# Copy .env.example to .env
-cp .env.example .env
+# Copy .env.example to .env if it doesn't exist
+if [ ! -f "$ENV_FILE" ]; then
+    echo "Copying .env.example to .env..."
+    cp .env.example .env
+fi
 
 # Run Laravel migrations and generate application key
+echo "Running Laravel migrations and generating application key..."
+php artisan config:cache
 php artisan migrate
 php artisan key:generate
 php artisan storage:link
 
-# Create or update the Nginx configuration file for Laravel
-NGINX_CONF="/etc/nginx/sites-available/collectible_haven.conf"
-sudo bash -c "cat > $NGINX_CONF << 'EOF'
-server {
-    listen 80;
-    listen [::]:80;
-    server_name collecthaven.test;
-    root /home/\$USER/Collectible_haven/public;  # Updated path for Laravel
-    index index.php index.html index.htm;
-
-    location / {
-        try_files \$uri \$uri/ /index.php?\$query_string;  # Laravel routing
-    }
-
-    location ~ \.php$ {
-        include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
-        fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
-        include fastcgi_params;
-    }
-
-    location ~ /\.ht {
-        deny all;  # Deny access to .htaccess files
-    }
-
-    error_log /var/log/nginx/collectible_haven_error.log;
-    access_log /var/log/nginx/collectible_haven_access.log;
-}
-EOF"
-
-# Create a symbolic link to enable the site
-sudo ln -s /etc/nginx/sites-available/collectible_haven.conf /etc/nginx/sites-enabled/
-
-# Optional: Add entry to /etc/hosts for collecthaven.test
-echo "127.0.0.1 collecthaven.test" | sudo tee -a /etc/hosts
-
-# Test Nginx configuration
-sudo nginx -t
-
-# Reload Nginx to apply changes
-sudo systemctl reload nginx
 
 echo "Setup completed successfully!"
