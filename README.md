@@ -39,39 +39,26 @@ Collectible Haven is a Laravel-based web application designed for collectors to 
 
 ## Installation
 
-### Option 1: Docker Setup (Recommended)
-1. Clone the repository
-2. Copy `.env.example` to `.env` and configure your environment variables
-3. Run:
-```bash
-docker-compose up -d --build
-```
-4. After containers are running, execute:
-```bash
-docker-compose exec app composer install
-docker-compose exec app npm install
-docker-compose exec app php artisan key:generate
-docker-compose exec app php artisan migrate --seed
-```
-
 ### Option 2: Manual Setup
 1. Clone the repository 
 2. Install dependencies:
 ```bash
-composer install
-npm install
+sudo apt install mariadb-server -y && mysql -u root -p
 ```
-3. Configure `.env` file:
+3. Run following mysql command :
 ```bash
-cp .env.example .env
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%';
+FLUSH PRIVILEGES;
+EXIT;
 ```
-4. Generate application key:
+4. Restart Mariadb Server:
 ```bash
-php artisan key:generate
+sudo systemctl restart mariadb
 ```
 5. Run migrations:
 ```bash
-php artisan migrate
+sudo chmod +x ./startup.sh
+./startup.sh
 ```
 #### Testing run
 Run a pre loaded data for testing the file:
