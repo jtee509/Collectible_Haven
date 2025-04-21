@@ -18,6 +18,14 @@ sudo apt install -y mariadb-server
 sudo systemctl start mariadb
 sudo systemctl enable mariadb
 
+# Variables
+MYSQL_ROOT_PASSWORD=""  # Replace with your MySQL root password
+
+# Grant all privileges to root user
+mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' WITH GRANT OPTION; FLUSH PRIVILEGES;"
+
+echo "All privileges granted to root user."
+
 # Secure MariaDB installation (you may want to customize this)
 sudo mysql_secure_installation
 
@@ -38,7 +46,6 @@ cp .env.example .env
 php artisan migrate
 php artisan key:generate
 php artisan 
-
 
 # Optional: Add entry to /etc/hosts for collecthaven.test
 echo "127.0.0.1 collecthaven.test" | sudo tee -a /etc/hosts
